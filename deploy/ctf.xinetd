@@ -1,0 +1,15 @@
+service CreativityPlus
+{
+        disable = no
+        flags           = REUSE
+        type            = UNLISTED
+        protocol        = tcp
+        socket_type     = stream
+        wait            = no
+        user            = root
+        server          = node
+        server_args     = deploy.js 8545 2>&1 >/root/log/deploy.log
+        log_type        = FILE /root/log/xinet.log
+        log_on_failure  += USERID HOST
+        log_on_success  = DURATION EXIT HOST PID USERID
+}
