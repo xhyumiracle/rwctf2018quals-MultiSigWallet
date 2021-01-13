@@ -121,3 +121,4 @@ web3.personal.lockAccount(adminacct)
 console.log('waiting for transfer event...');
 watchTransferEvent(wallet, token, adminacct);
 
+console.log('\n[+] Now you can start to play!');

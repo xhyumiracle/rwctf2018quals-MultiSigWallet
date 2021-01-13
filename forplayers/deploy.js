@@ -1,6 +1,7 @@
 let fs = require("fs");
 let Web3 = require('web3');
 let web3 = new Web3();
+var adminacct = '0xa8c29ab108392022b1c46d7706fdf4f596ded3dd'
 var password = fs.readFileSync("password.txt").toString().trim();
 var privk = fs.readFileSync("privkey.txt").toString().trim();
 
@@ -17,9 +18,9 @@ function importAccount(){
     }
 }
 
-function setDefaultAccountUnlock(){
+function setDefaultAccountUnlock(acct){
     console.log("Unlocking coinbase account");
-    web3.eth.defaultAccount = web3.eth.coinbase;
+    web3.eth.defaultAccount = acct;
     try {
         web3.personal.unlockAccount(web3.eth.defaultAccount, password);
     } catch(e) {
@@ -55,22 +56,22 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function sendFlagTo(contract){
+function sendFlagTo(contract, acct){
     let flag = fs.readFileSync("flag.txt");
     console.log('unlocking account');
-    setDefaultAccountUnlock()
+    setDefaultAccountUnlock(acct)
     console.log('sending flag!');
     contract.publishMessage(flag.toString().trim());
 }
 
-function watchTransferEvent(wallet, token){
+function watchTransferEvent(wallet, token, flagsender){
     var transferEvent = token.Transfer({fromBlock: 0, toBlock: 'latest'});
     transferEvent.watch(function(error, result){
         if (error) {console.log(error);}
         else{
             console.log(result.args);
             if(result.args._amount.toNumber() >= 1000000){
-                sendFlagTo(wallet);
+                sendFlagTo(wallet, flagsender);
             }else{console.log('amount too low.')}
         }
     });
@@ -96,7 +97,7 @@ function getContractInstance(contractName, contractAddr){
 }
 
 importAccount()
-setDefaultAccountUnlock();
+setDefaultAccountUnlock(adminacct);
 
 // deploy MultiSigWallet contract
 walletC = deploy('MultiSigWallet', 3000000);
@@ -115,8 +116,9 @@ token.grantToken(walletAddr);
 wallet.addTrusted(tokenAddr);
 
 console.log('locking account');
-web3.personal.lockAccount('0xa8c29ab108392022b1c46d7706fdf4f596ded3dd')
+web3.personal.lockAccount(adminacct)
 
 console.log('waiting for transfer event...');
-watchTransferEvent(wallet, token);
+watchTransferEvent(wallet, token, adminacct);
 
+console.log('\n[+] Now you can start to play!');
