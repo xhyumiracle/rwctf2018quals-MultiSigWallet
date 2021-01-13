@@ -12,18 +12,21 @@ It could take about 10-20 seconds for the flag to be delievered after you solved
 
 use 0xd05f77446359c68feb753a542db4f8a69a6566c9 to play, it's already unlocked
 
-## Env
+## Env & PoC
 ```
 $ cd deploy
 $ docker build -t msw .
 $ docker run -it --rm -p 8545:8545 --name chal1 msw
 ```
-
-## PoC
 ```
 $ cd poc
 $ docker build -t msw-poc .
 $ docker run -it --rm --name poc1 msw-poc
+```
+or
+```
+$ docker pull xhyumiracle/rwctf18-multisigwallet
+$ docker pull xhyumiracle/rwctf18-multisigwallet-poc
 ```
 
 ## Info
